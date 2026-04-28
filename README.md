@@ -28,7 +28,7 @@ cd sleepy-dots
 
 1. Installs **iNiR** (dotfiles manager)
 2. Installs **dcli** from the AUR (declarative package/hook manager)
-3. Copies the `inir-dots` module and post-install hook into `~/.config/arch-config`
+3. Copies the `inir-dots` module and post-install hook into `~/.config/dcli`
 4. Enables the module for your hostname
 5. Runs `dcli sync` to apply everything
 

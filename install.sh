@@ -69,7 +69,7 @@ log_info "dcli installation complete."
 # ───────────────────────────────────────────────
 # 4. Initialize dcli configuration (if needed)
 # ───────────────────────────────────────────────
-DCLI_CONFIG="${HOME}/.config/arch-config"
+DCLI_CONFIG="${HOME}/.config/dcli"
 if [ ! -d "${DCLI_CONFIG}" ]; then
     log_info "Initializing dcli configuration..."
     dcli init
