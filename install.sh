@@ -70,6 +70,14 @@ log_info "dcli installation complete."
 # 4. Initialize dcli configuration (if needed)
 # ───────────────────────────────────────────────
 DCLI_CONFIG="${HOME}/.config/dcli"
+ARCH_CONFIG="${HOME}/.config/arch-config"
+
+# Fallback to legacy arch-config if it exists and dcli dir doesn't
+if [ ! -d "${DCLI_CONFIG}" ] && [ -d "${ARCH_CONFIG}" ]; then
+    DCLI_CONFIG="${ARCH_CONFIG}"
+    log_warn "Using legacy dcli config directory: ${DCLI_CONFIG}"
+fi
+
 if [ ! -d "${DCLI_CONFIG}" ]; then
     log_info "Initializing dcli configuration..."
     dcli init
