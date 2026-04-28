@@ -39,7 +39,3 @@ To re-run the iNiR installer later:
 ```bash
 dcli hooks run
 ```
-
----
-
-> :warning: **Arch Linux only** — this script requires `pacman`.
