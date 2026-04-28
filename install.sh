@@ -35,7 +35,7 @@ cd "${INIR_TMP}"
 ./setup install -y
 cd /
 rm -rf "${INIR_TMP}"
-log_info "iNiR installation complete."
+log_info "iNiR installation complete :)."
 
 # ───────────────────────────────────────────────
 # 3. Install dcli-arch-git from AUR
