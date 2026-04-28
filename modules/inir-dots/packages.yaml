@@ -1,0 +1,127 @@
+description: iNiR desktop shell dependencies and dcli recommended tools
+
+packages:
+  # ─── dcli recommended dependencies ───
+  - fzf
+
+  # ─── Core (inir-core) ───
+  - niri
+  - quickshell
+  - bc
+  - coreutils
+  - cliphist
+  - curl
+  - wget
+  - ripgrep
+  - jq
+  - python
+  - xdg-user-dirs
+  - xdg-utils
+  - rsync
+  - git
+  - wl-clipboard
+  - libnotify
+  - pacman-contrib
+  - wlsunset
+  - dolphin
+  - xdg-desktop-portal
+  - xdg-desktop-portal-gtk
+  - xdg-desktop-portal-gnome
+  - polkit
+  - networkmanager
+  - gnome-keyring
+  - nautilus
+  - kitty
+  - foot
+  - fish
+  - gum
+  - xwayland-satellite
+
+  # ─── Quickshell runtime (inir-quickshell) ───
+  - qt6-declarative
+  - qt6-base
+  - qt6-svg
+  - qt6-wayland
+  - qt6-5compat
+  - qt6-imageformats
+  - qt6-multimedia
+  - qt6-positioning
+  - qt6-quicktimeline
+  - qt6-sensors
+  - qt6-tools
+  - qt6-translations
+  - qt6-virtualkeyboard
+  - jemalloc
+  - libpipewire
+  - libxcb
+  - wayland
+  - libdrm
+  - mesa
+  - kirigami
+  - kdialog
+  - syntax-highlighting
+  - qt6ct
+  - breeze-icons
+  - plasma-integration
+  # AUR
+  - qt6-avif-image-plugin
+
+  # ─── Audio stack (inir-audio) ───
+  - pipewire
+  - pipewire-pulse
+  - pipewire-alsa
+  - wireplumber
+  - playerctl
+  - libdbusmenu-gtk3
+  - pavucontrol
+  - mpv
+  - mpv-mpris
+  - yt-dlp
+  - socat
+  - cava
+  - easyeffects
+
+  # ─── Screenshots & Recording (inir-screencapture) ───
+  - grim
+  - slurp
+  - swappy
+  - tesseract
+  - tesseract-data-eng
+  - wf-recorder
+  - imagemagick
+  - ffmpeg
+
+  # ─── Input Toolkit (inir-toolkit) ───
+  - upower
+  - wtype
+  - ydotool
+  - python-evdev
+  - python-pillow
+  - brightnessctl
+  - ddcutil
+  - geoclue
+  - swayidle
+  - swaylock
+  - blueman
+  - fprintd
+  - libqalculate
+  - tesseract-data-spa
+
+  # ─── Fonts & Theming (inir-fonts) ───
+  - fontconfig
+  - ttf-dejavu
+  - ttf-liberation
+  - fuzzel
+  - glib2
+  - translate-shell
+  - kvantum
+  # AUR
+  - darkly-bin
+  - ttf-jetbrains-mono-nerd
+  - ttf-material-symbols-variable-git
+  - ttf-readex-pro
+  - ttf-rubik-vf
+  - otf-space-grotesk
+  - ttf-twemoji
+  - adw-gtk-theme-git
+  - capitaine-cursors

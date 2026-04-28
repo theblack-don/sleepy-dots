@@ -1,0 +1,6 @@
+description: iNiR desktop shell dependencies and dcli recommended tools
+
+post_install_hook: scripts/inir-post-install.sh
+# Default to skip so re-runs of dcli sync do not reinstall iNiR automatically.
+# Users can manually trigger the hook later with: dcli hooks run
+hook_behavior: skip
