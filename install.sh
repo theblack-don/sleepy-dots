@@ -80,9 +80,22 @@ fi
 
 if [ ! -d "${DCLI_CONFIG}" ]; then
     log_info "Initializing dcli configuration..."
+    # dcli init may return non-zero even on success; don't let it kill the script
+    set +e
     dcli init
+    DCLI_INIT_EXIT=$?
+    set -e
+    if [ $DCLI_INIT_EXIT -ne 0 ]; then
+        log_warn "dcli init exited with code ${DCLI_INIT_EXIT}, but continuing..."
+    fi
 else
     log_info "dcli configuration already exists at ${DCLI_CONFIG}"
+fi
+
+# Double-check the config directory actually exists now
+if [ ! -d "${DCLI_CONFIG}" ]; then
+    log_error "dcli config directory still missing after init: ${DCLI_CONFIG}"
+    exit 1
 fi
 
 # ───────────────────────────────────────────────
@@ -150,7 +163,13 @@ fi
 # 7. Sync dcli to install all tracked packages
 # ───────────────────────────────────────────────
 log_info "Running dcli sync to install tracked packages..."
+set +e
 dcli sync
+DCLI_SYNC_EXIT=$?
+set -e
+if [ $DCLI_SYNC_EXIT -ne 0 ]; then
+    log_warn "dcli sync exited with code ${DCLI_SYNC_EXIT}."
+fi
 
 log_info ""
 log_info "=========================================="
