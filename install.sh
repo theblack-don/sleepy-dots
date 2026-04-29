@@ -67,7 +67,7 @@ ${AUR_HELPER} -S --noconfirm dcli-arch-git
 log_info "dcli installation complete."
 
 # ───────────────────────────────────────────────
-# 4. Initialize dcli configuration (if needed)
+# 4. Determine dcli config directory
 # ───────────────────────────────────────────────
 DCLI_CONFIG="${HOME}/.config/dcli"
 ARCH_CONFIG="${HOME}/.config/arch-config"
@@ -78,85 +78,57 @@ if [ ! -d "${DCLI_CONFIG}" ] && [ -d "${ARCH_CONFIG}" ]; then
     log_warn "Using legacy dcli config directory: ${DCLI_CONFIG}"
 fi
 
-if [ ! -d "${DCLI_CONFIG}" ]; then
-    log_info "Initializing dcli configuration..."
-    # dcli init may return non-zero even on success; don't let it kill the script
-    set +e
-    dcli init
-    DCLI_INIT_EXIT=$?
-    set -e
-    if [ $DCLI_INIT_EXIT -ne 0 ]; then
-        log_warn "dcli init exited with code ${DCLI_INIT_EXIT}, but continuing..."
-    fi
-else
-    log_info "dcli configuration already exists at ${DCLI_CONFIG}"
-fi
+# ───────────────────────────────────────────────
+# 5. Deploy dcli configuration from repo template
+# ───────────────────────────────────────────────
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="${REPO_DIR}/dcli-config"
 
-# Double-check the config directory actually exists now
-if [ ! -d "${DCLI_CONFIG}" ]; then
-    log_error "dcli config directory still missing after init: ${DCLI_CONFIG}"
+log_info "Repo directory:  ${REPO_DIR}"
+log_info "dcli config dir: ${DCLI_CONFIG}"
+
+if [ ! -d "${TEMPLATE_DIR}" ]; then
+    log_error "Template directory not found: ${TEMPLATE_DIR}"
     exit 1
 fi
 
-# ───────────────────────────────────────────────
-# 5. Copy module files into dcli config
-# ───────────────────────────────────────────────
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-log_info "Repo directory:     ${REPO_DIR}"
-log_info "dcli config dir:    ${DCLI_CONFIG}"
-log_info "Copying inir-dots module to ${DCLI_CONFIG}/modules/..."
+# Backup existing config if present
+if [ -d "${DCLI_CONFIG}" ]; then
+    BACKUP_DIR="${DCLI_CONFIG}.backup.$(date +%s)"
+    log_warn "Existing dcli config found. Backing up to ${BACKUP_DIR}..."
+    mv "${DCLI_CONFIG}" "${BACKUP_DIR}"
+fi
 
-# Ensure destinations exist (dcli init usually creates modules/, but be safe)
-mkdir -p "${DCLI_CONFIG}/modules"
-mkdir -p "${DCLI_CONFIG}/scripts"
+# Copy template config
+log_info "Copying dcli configuration template..."
+cp -r "${TEMPLATE_DIR}" "${DCLI_CONFIG}"
 
-# Copy module files
-cp -r "${REPO_DIR}/inir-dots" "${DCLI_CONFIG}/modules/"
-cp "${REPO_DIR}/scripts/inir-post-install.sh" "${DCLI_CONFIG}/scripts/"
-chmod +x "${DCLI_CONFIG}/scripts/inir-post-install.sh"
+# Rename host template to actual hostname
+HOST_FILE="${DCLI_CONFIG}/hosts/${HOSTNAME}.yaml"
+mv "${DCLI_CONFIG}/hosts/template.yaml" "${HOST_FILE}"
+
+# Update config.yaml to point to the new host file
+sed -i "s|hosts/template.yaml|hosts/${HOSTNAME}.yaml|g" "${DCLI_CONFIG}/config.yaml"
+
+log_info "Host config created: ${HOST_FILE}"
 
 # Verify the copy worked
 if [ ! -f "${DCLI_CONFIG}/modules/inir-dots/module.yaml" ]; then
     log_error "Module copy failed: ${DCLI_CONFIG}/modules/inir-dots/module.yaml not found."
-    log_error "Source was: ${REPO_DIR}/inir-dots"
     exit 1
 fi
 log_info "Module copied successfully."
 
 # ───────────────────────────────────────────────
-# 6. Enable the inir-dots module in host config
+# 6. Validate dcli configuration
 # ───────────────────────────────────────────────
-HOST_FILE="${DCLI_CONFIG}/hosts/${HOSTNAME}.yaml"
-if [ ! -f "${HOST_FILE}" ]; then
-    log_warn "Host file not found: ${HOST_FILE}"
-    log_warn "Skipping automatic module enablement."
-    log_warn "To enable manually, add 'inir-dots' to enabled_modules in your host config."
-else
-    log_info "Adding inir-dots to enabled_modules in ${HOST_FILE}..."
-python3 -c "
-import sys
-path = sys.argv[1]
-module = sys.argv[2]
-
-with open(path, 'r') as f:
-    lines = f.readlines()
-
-content = ''.join(lines)
-if module in content:
-    print(f'Module {module} is already enabled in the host config.')
-    sys.exit(0)
-
-for i, line in enumerate(lines):
-    if line.strip().startswith('enabled_modules:'):
-        lines.insert(i + 1, f'  - {module}\n')
-        break
-else:
-    lines.append(f'\nenabled_modules:\n  - {module}\n')
-
-with open(path, 'w') as f:
-    f.writelines(lines)
-print(f'Module {module} appended to enabled_modules.')
-" "${HOST_FILE}" "inir-dots"
+log_info "Validating dcli configuration..."
+set +e
+dcli validate
+DCLI_VALIDATE_EXIT=$?
+set -e
+if [ $DCLI_VALIDATE_EXIT -ne 0 ]; then
+    log_warn "dcli validate exited with code ${DCLI_VALIDATE_EXIT}."
 fi
 
 # ───────────────────────────────────────────────

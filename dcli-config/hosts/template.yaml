@@ -1,0 +1,7 @@
+description: Host configuration for template
+
+package_manager: pacman
+
+enabled_modules:
+  - base
+  - inir-dots
