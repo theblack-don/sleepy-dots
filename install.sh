@@ -118,7 +118,10 @@ HOST_FILE="${DCLI_CONFIG}/hosts/${HOSTNAME}.yaml"
 mv "${DCLI_CONFIG}/hosts/template.yaml" "${HOST_FILE}"
 
 # Update config.yaml to point to the new host file
-sed -i "s|hosts/template.yaml|hosts/${HOSTNAME}.yaml|g" "${DCLI_CONFIG}/config.yaml"
+sed -i "s|^host: template$|host: ${HOSTNAME}|" "${DCLI_CONFIG}/config.yaml"
+
+# Update the host file's own host identifier
+sed -i "s|^host: template$|host: ${HOSTNAME}|" "${HOST_FILE}"
 
 log_info "Host config created: ${HOST_FILE}"
 

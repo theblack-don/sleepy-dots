@@ -1,3 +1,4 @@
+host: template
 description: Host configuration for template
 
 package_manager: pacman
