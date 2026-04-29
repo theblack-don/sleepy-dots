@@ -89,24 +89,37 @@ fi
 # 5. Copy module files into dcli config
 # ───────────────────────────────────────────────
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-log_info "Copying module files to ${DCLI_CONFIG}..."
+log_info "Repo directory:     ${REPO_DIR}"
+log_info "dcli config dir:    ${DCLI_CONFIG}"
+log_info "Copying inir-dots module to ${DCLI_CONFIG}/modules/..."
+
+# Ensure destinations exist (dcli init usually creates modules/, but be safe)
 mkdir -p "${DCLI_CONFIG}/modules"
 mkdir -p "${DCLI_CONFIG}/scripts"
-cp -r "${REPO_DIR}/modules/inir-dots" "${DCLI_CONFIG}/modules/"
+
+# Copy module files
+cp -r "${REPO_DIR}/inir-dots" "${DCLI_CONFIG}/modules/"
 cp "${REPO_DIR}/scripts/inir-post-install.sh" "${DCLI_CONFIG}/scripts/"
 chmod +x "${DCLI_CONFIG}/scripts/inir-post-install.sh"
+
+# Verify the copy worked
+if [ ! -f "${DCLI_CONFIG}/modules/inir-dots/module.yaml" ]; then
+    log_error "Module copy failed: ${DCLI_CONFIG}/modules/inir-dots/module.yaml not found."
+    log_error "Source was: ${REPO_DIR}/inir-dots"
+    exit 1
+fi
+log_info "Module copied successfully."
 
 # ───────────────────────────────────────────────
 # 6. Enable the inir-dots module in host config
 # ───────────────────────────────────────────────
 HOST_FILE="${DCLI_CONFIG}/hosts/${HOSTNAME}.yaml"
 if [ ! -f "${HOST_FILE}" ]; then
-    log_error "Host file not found: ${HOST_FILE}"
-    log_error "Please ensure 'dcli init' ran correctly."
-    exit 1
-fi
-
-log_info "Adding inir-dots to enabled_modules in ${HOST_FILE}..."
+    log_warn "Host file not found: ${HOST_FILE}"
+    log_warn "Skipping automatic module enablement."
+    log_warn "To enable manually, add 'inir-dots' to enabled_modules in your host config."
+else
+    log_info "Adding inir-dots to enabled_modules in ${HOST_FILE}..."
 python3 -c "
 import sys
 path = sys.argv[1]
@@ -131,6 +144,7 @@ with open(path, 'w') as f:
     f.writelines(lines)
 print(f'Module {module} appended to enabled_modules.')
 " "${HOST_FILE}" "inir-dots"
+fi
 
 # ───────────────────────────────────────────────
 # 7. Sync dcli to install all tracked packages
