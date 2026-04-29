@@ -5,3 +5,21 @@ package_manager: pacman
 enabled_modules:
   - base
   - inir-dots
+
+packages: []
+exclude: []
+additional_packages: []
+flatpak_scope: user
+auto_prune: false
+module_processing: parallel
+strict_package_order: false
+config_backups:
+  enabled: true
+  max_backups: 5
+system_backups:
+  enabled: false
+  backup_on_sync: false
+  backup_on_update: false
+  tool: null
+  snapper_config: root
+  max_backups: 5
