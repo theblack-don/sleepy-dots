@@ -79,9 +79,19 @@ if [ ! -d "${DCLI_CONFIG}" ] && [ -d "${ARCH_CONFIG}" ]; then
 fi
 
 # ───────────────────────────────────────────────
-# 5. Deploy dcli configuration from repo template
+# 5. Resolve repo directory (cloned or piped)
 # ───────────────────────────────────────────────
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# When piped (curl | bash), BASH_SOURCE is empty so we clone the repo.
+SCRIPT_SOURCE="${BASH_SOURCE[0]:-}"
+if [ -n "${SCRIPT_SOURCE}" ]; then
+    REPO_DIR="$(cd "$(dirname "${SCRIPT_SOURCE}")" && pwd)"
+else
+    log_info "Piped execution detected. Cloning repo to temporary directory..."
+    REPO_DIR="/tmp/sleepy-dots"
+    rm -rf "${REPO_DIR}"
+    git clone https://github.com/theblack-don/sleepy-dots.git "${REPO_DIR}"
+fi
+
 TEMPLATE_DIR="${REPO_DIR}/dcli-config"
 
 log_info "Repo directory:  ${REPO_DIR}"
